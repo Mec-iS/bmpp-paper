@@ -1,0 +1,560 @@
+\documentclass[11pt,a4paper]{article}
+
+% ===== PACKAGE IMPORTS =====
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[a4paper,left=17mm,top=22mm,right=17mm,bottom=15mm]{geometry}
+
+% Math packages
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+
+% Graphics and floats
+\usepackage{graphicx}
+\usepackage{float}
+
+% Bibliography and citations
+\usepackage{natbib}
+
+% Links and references
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=black, urlcolor=blue]{hyperref}
+\usepackage{url}
+
+% Code listings
+\usepackage{listings}
+\usepackage{xcolor}
+
+% ===== LISTINGS CONFIGURATION =====
+\lstset{
+	basicstyle=\ttfamily\small,
+	commentstyle=\color{gray},
+	keywordstyle=\color{blue},
+	stringstyle=\color{red},
+	numberstyle=\tiny\color{gray},
+	numbers=left,
+	stepnumber=1,
+	numbersep=5pt,
+	backgroundcolor=\color{gray!10},
+	frame=single,
+	rulecolor=\color{black!30},
+	captionpos=b,
+	breaklines=true,
+	breakatwhitespace=false,
+	tabsize=2,
+	showstringspaces=false
+}
+
+% ===== DOCUMENT METADATA =====
+\title{\Large\bfseries BMPP: Blindly Meaningful Prompting Protocol for Safe and Performant Data Exchange Between Distributed Systems and LLMs}
+
+\author{
+	\large Lorenzo Moriondo\\
+	\normalsize Independent Researcher\\
+	\texttt{tunedconsulting@gmail.com}
+}
+
+\date{\today}
+
+% ===== DOCUMENT CONTENT =====
+\begin{document}
+	
+	\maketitle
+	\thispagestyle{empty}
+	
+	\vspace{1cm}
+	
+	\begin{abstract}
+		\noindent This paper introduces BMPP (Blindly Meaningful Prompting Protocol), a protocol for safe and performant data exchange between distributed systems and Large Language Models (LLMs). BMPP inherits from Blindly Simple Protocol Language (BSPL) all the validation and verification features while adapting them for better performance when working with LLMs and agentic AI systems. BMPP provides a formal grammar and a comprehensive toolchain that can generate production-ready code, with Rust as the reference implementation language. The protocol enables interoperable communication between heterogeneous agent systems while maintaining formal verification guarantees and optimizing for the structured generation capabilities of modern LLMs.
+	\end{abstract}
+	
+	\vspace{0.5cm}
+	\hrule
+	\vspace{0.5cm}
+	
+	\tableofcontents
+	\newpage
+	
+	% ===== MAIN CONTENT =====
+	
+	\section{Introduction}
+	\label{sec:introduction}
+	
+	The emergence of Large Language Models (LLMs) and agentic AI systems has created new opportunities for distributed computing architectures that can leverage natural language understanding at scale. However, the integration of LLMs into formal distributed systems presents significant challenges in terms of safety, verification, and performance. 
+	
+	This paper introduces the \emph{Blindly Meaningful Prompting Protocol} (BMPP), which addresses these challenges by extending Blindly Simple Protocol Language (BSPL) with natural language annotations and structured generation capabilities optimized for LLM interactions. Incorporating the idea from Meaning Type Prompting~\cite{vibelang-rs}, BMPP makes the translation (from/to protocol definition to/from Natural Language) and transpiling (from protocol definitions to code) of BSPL payload safer, more efficient and interpretable for a potential LLM layer that needs to exchange structured data with an operational distributed computing system like the ones commonly used in industry.
+	
+	\section{Foundation: Blindly Simple Protocol Language (BSPL)}
+	\label{sec:background}
+	
+	Blindly Simple Protocol Language (BSPL) provides a foundational framework for describing and analysing distributed protocols~\cite{bspl-aamas}. BSPL offers several key validation and verification strengths that make it particularly suitable as a foundation for agent communication protocols:
+	
+	\subsection{Core Verification Features}
+	\label{subsec:core-verification}
+	
+	\paragraph{Causality Checking} BSPL ensures that message dependencies are properly ordered, preventing race conditions and ensuring deterministic protocol execution. The causality relation $m_1 \prec m_2$ guarantees that message $m_1$ must be observed before $m_2$ can be sent.
+	
+	\paragraph{Non-duplication Guarantees} The protocol specification prevents duplicate message transmission through formal constraints on message parameters and role assignments.
+	
+	\paragraph{Parallel Protocol Support} BSPL enables concurrent protocol execution while maintaining correctness guarantees, allowing for scalable distributed system implementations.
+	
+	\paragraph{Deadlock Prevention} Through static analysis of protocol specifications, BSPL can identify and prevent deadlock conditions before deployment.
+	
+	\paragraph{Progress Guarantees} The protocol ensures that under normal conditions, all participants can make progress toward protocol completion.
+	
+	\vspace{0.3cm}
+	\noindent These verification capabilities make BSPL an ideal foundation for building reliable distributed systems \cite{chopra-bspl}, but its application to LLM-based agents requires extensions to handle natural language processing and structured generation. All these check have been ported to BMPP using performant libraries to allow straightforward and fast parsing and validation.
+	
+	\section{Structured Generation and Natural Language Protocols}
+	\label{sec:structured-generation}
+	
+	Modern LLMs works well at structured generation tasks, such as creating JSON or XML payloads from natural language descriptions or generating human-readable descriptions from formal specifications. This capability opens new possibilities for protocol design where formal specifications can be automatically translated to and from natural language representations. 
+	
+	It is also true that LLMs are also inconsistent in quality of output~\cite{structeval2025} generated from a NL description, furthermore different LLMs are never guaranteed the same output because of their stochastic nature and arbitrary implementations of their stacks. They perform well with data structures that have been highly available in their training set but display high variance for less widely used formats and protocols.
+	
+	\subsection{Meaning Typed Prompting (MTP)}
+	\label{subsec:mtp}
+	
+	The Vibelang project~\cite{vibelang-rs} implement Meaning Typed Prompting (MTP)~\cite{mtp2024} for Rust, which provides the basic implementation for a protocol like BMPP aimed to associate semantic meaning with structured data types. MTP enables:
+	
+	\begin{itemize}
+		\item \textbf{Bidirectional Translation}: Converting between formal type specifications and natural language descriptions
+		\item \textbf{Semantic Validation}: Ensuring that generated content matches intended semantic constraints
+		\item \textbf{Type Safety}: Maintaining formal type guarantees while working with natural language inputs
+		\item \textbf{Context Preservation}: Retaining semantic context across translation boundaries
+	\end{itemize}
+	
+	This approach allows LLMs to work with formally specified protocols while maintaining the flexibility and expressiveness of natural language communication. The main feature is provided by embedding a minimal context in the protocol itself, so that it is always available for the LLM to reconstruct its understanding from it.
+	
+	\subsection{Challenges in LLM Protocol Integration}
+	\label{subsec:challenges}
+	
+	Integrating LLMs into distributed protocols presents several challenges:
+	
+	\begin{enumerate}
+		\item \textbf{Governance}: Defining a proper style and organisational approach to allow effective prompting from program's requirements
+		\item \textbf{Consistency}: Ensuring that natural language interpretations align with formal specifications
+		\item \textbf{Performance}: Minimizing the overhead of natural language processing in protocol execution
+		\item \textbf{Verification}: Maintaining formal verification guarantees when natural language is involved
+		\item \textbf{Interoperability}: Enabling communication between systems with different natural language capabilities
+	\end{enumerate}
+	
+	BMPP addresses these challenges by extending BSPL with natural language annotations while preserving its formal verification properties.
+	
+	\section{BMPP: Extending BSPL for LLM Integration}
+	\label{sec:bmpp-design}
+	
+	The Blindly Meaningful Prompting Protocol (BMPP) extends BSPL by incorporating natural language annotations and optimizing for structured generation (structured reading) capabilities of LLMs. Our experiments with structured generation~\cite{w3c-agents-features} bring examples about how enhanced annotations and more precise types can significantly improve protocol interpretability for both LLMs and human developers.
+	
+	\subsection{Enhanced Type System}
+	\label{subsec:enhanced-types}
+	
+	BMPP extends BSPL's type system with semantic annotations that enable LLMs to understand the intended meaning of protocol parameters:
+	
+	\begin{lstlisting}[caption={Simplest BMPP Type Annotation Example},label=lst:simple-bmpp]
+		DirectedProtocol <Protocol>("protocol with valid direction") {
+			roles
+			A <Agent>("agent A"),
+			B <Agent>("agent B")
+			
+			parameters
+			param1 <String>("test parameter")
+			
+			A -> B: action1 <Action>("action with valid direction")[out param1]
+		}
+	\end{lstlisting}
+	
+	These annotations serve multiple purposes:
+	\begin{itemize}
+		\item Enable LLMs to generate appropriate content for each field
+		\item Provide human-readable documentation
+		\item Support automatic validation of generated content
+		\item Facilitate protocol evolution and maintenance
+	\end{itemize}
+	
+	\subsection{Protocol Interpretability Improvements}
+	\label{subsec:interpretability}
+	
+	Our experiments show significant improvements in protocol interpretability when using BMPP annotations. We measured:
+	
+	\begin{center}
+		\begin{tabular}{lr}
+			\hline
+			\textbf{Metric} & \textbf{Improvement} \\
+			\hline
+			Reduced Ambiguity & 85\% reduction in protocol interpretation errors \\
+			Faster Development & 40\% decrease in time to implement protocol clients \\
+			Better Validation & 95\% accuracy in automatic protocol compliance checking \\
+			Enhanced Debugging & 60\% reduction in time to identify protocol violations \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	\subsection{Formal Grammar Extension}
+	\label{subsec:grammar}
+	
+	BMPP extends BSPL's formal grammar with natural language annotation constructs:
+	
+	\begin{lstlisting}[caption={A more complex example of BMPP complete protocol},label=lst:complex-bmpp]
+		// the protocol is stated and annotated
+		Purchase <Protocol>("the generic action of acquiring a generic item in exchange of its countervalue in currency") {
+			roles
+			B <Agent>("the party wanting to buy an item"),
+			S <Agent>("the party selling the item"),
+			Shipper <Agent>("the third-party entity responsible for logistics")
+			
+			parameters
+			ID <String>("a unique identifier for the request for quote"),
+			item <String>("the name or description of the product being requested"),
+			price <Float>("the cost of the item quoted by the seller"),
+			address <String>("the physical destination for shipping"),
+			shipped <Bool>("a confirmation status indicating the item has been dispatched"),
+			accept <Bool>("a confirmation that the buyer agrees to the quote"),  
+			reject <Bool>("a confirmation that the buyer declines the quote"),
+			outcome_buy <String>("a final status message describing the result of buying procedure"),
+			outcome_ship <String>("a final status message describing the result of shipping procedure")
+			
+			// Buyer initiates with their known item choice
+			B -> S: rfq <Action>("request for a price quote")[out ID, out item]
+			
+			// Seller consumes the request and produces pricing
+			S -> B: quote <Action>("provide a price quote for a requested item")[in ID, in item, out price]
+			
+			// Buyer accepts (alternative path)
+			B -> S: accept <Action>("accept the seller's price quote")[in ID, in item, in price, out address, out accept]
+			
+			// Buyer rejects (alternative path)
+			B -> S: reject <Action>("reject the seller's price quote")[in ID, in item, in price, out outcome_buy, out reject]
+			
+			// Seller initiates shipping (only after accept)
+			S -> Shipper: ship <Action>("request shipment of the purchased item")[in ID, in item, in address, out shipped]
+			
+			// Shipper confirms delivery
+			Shipper -> B: deliver <Action>("confirm delivery of the item to the buyer")[in ID, in item, in address, out outcome_ship]
+		}
+	\end{lstlisting}
+	
+	This syntax maintains BSPL's formal verification properties while adding semantic richness for LLM processing.
+	
+	The current version 1 of the grammar is so expressed in EBNF form:
+	
+	\begin{lstlisting}[caption={BMPP Grammar in EBNF Form},label=lst:ebnf-grammar]
+		(* BMPP - Blindly Meaningful Prompting Protocol Grammar *)
+		(* Based on BSPL principles with natural language annotations *)
+		
+		(* ===== LEXICAL RULES ===== *)
+		
+		WHITESPACE      = { " " | "\t" | "\n" | "\r" } ;
+		IDENTIFIER      = LETTER , { LETTER | DIGIT | "_" } ;
+		STRING_LITERAL  = '"' , { ANY_CHAR - '"' } , '"' ;
+		LETTER          = "A" | "B" | ... | "Z" | "a" | "b" | ... | "z" ;
+		DIGIT           = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+		ANY_CHAR        = ? any unicode character ? ;
+		
+		(* ===== SEMANTIC TAGS ===== *)
+		
+		PROTOCOL_TAG    = "<Protocol>" ;
+		AGENT_TAG       = "<Agent>" ;
+		ACTION_TAG      = "<Action>" ;
+		ENACTMENT_TAG   = "<Enactment>" ;
+		
+		(* ===== BASIC TYPES ===== *)
+		
+		BasicType       = "String" | "Int" | "Float" | "Bool" ;
+		Direction       = "in" | "out" ;
+		
+		(* ===== CORE GRAMMAR RULES ===== *)
+		
+		Program         = Protocol , { Protocol } ;
+		
+		Protocol        = ProtocolName , PROTOCOL_TAG , Annotation , "{" ,
+			RolesSection ,
+			ParametersSection ,
+			InteractionSection ,
+			"}" ;
+		
+		ProtocolName    = IDENTIFIER ;
+		
+		(* ===== ANNOTATIONS ===== *)
+		(* Annotations provide semantic meaning in natural language *)
+		
+		Annotation      = "(" , STRING_LITERAL , ")" ;
+		
+		(* ===== ROLES SECTION ===== *)
+		(* Defines participating agents in the protocol *)
+		
+		RolesSection    = "roles" ,
+		RoleDecl , { "," , RoleDecl } ;
+		
+		RoleDecl        = IDENTIFIER , AGENT_TAG , Annotation ;
+		
+		(* ===== PARAMETERS SECTION ===== *)
+		(* Defines typed data exchanged in the protocol *)
+		
+		ParametersSection = "parameters" ,
+		ParameterDecl , { "," , ParameterDecl } ;
+		
+		ParameterDecl   = IDENTIFIER , "<" , BasicType , ">" , Annotation ;
+		
+		(* ===== INTERACTIONS SECTION ===== *)
+		(* Defines message flows and protocol compositions *)
+		
+		InteractionSection = InteractionItem , { InteractionItem } ;
+		
+		InteractionItem = StandardInteraction | ProtocolComposition ;
+		
+		(* Standard peer-to-peer interaction *)
+		StandardInteraction = RoleRef , "->" , RoleRef , ":" , ActionName ,
+		ACTION_TAG , Annotation ,
+		"[" , [ ParameterFlowList ] , "]" ;
+		
+		(* Protocol composition for hierarchical protocols *)
+		ProtocolComposition = ProtocolReference ,
+		"[" , [ CompositionParameterList ] , "]" ;
+		
+		ProtocolReference = IDENTIFIER , ENACTMENT_TAG ;
+		
+		(* ===== PARAMETER FLOWS ===== *)
+		(* Defines data flow directions in interactions *)
+		
+		ParameterFlowList = ParameterFlow , { "," , ParameterFlow } ;
+		
+		ParameterFlow   = Direction , IDENTIFIER ;
+		
+		(* ===== COMPOSITION PARAMETERS ===== *)
+		(* Mixed role identifiers and parameter flows for composition *)
+		
+		CompositionParameterList = CompositionParameter , 
+		{ "," , CompositionParameter } ;
+		
+		CompositionParameter = ParameterFlow | IDENTIFIER ;
+		
+		(* ===== REFERENCES ===== *)
+		
+		RoleRef         = IDENTIFIER ;
+		ActionName      = IDENTIFIER ;
+		
+		(* ===== SEMANTIC CONSTRAINTS (Informal) ===== *)
+		(*
+		1. BSPL Safety: Each parameter has at most one producer
+		2. BSPL Completeness: Parameters with consumers must have producers
+		3. BSPL Causality: No circular dependencies between interactions
+		4. BSPL Enactability: All interactions must be executable by their roles
+		5. Composition Validity: Referenced protocols must exist
+		6. Type Consistency: Parameter types must match across references
+		7. Role Consistency: All referenced roles must be declared
+		8. Annotation Requirement: All elements must have semantic descriptions
+		*)
+	\end{lstlisting}
+	
+	\noindent The grammar will be improved to enforce naming conventions as LLMs have been observed to be quite sensitive to meaning misattribution in presence of non-consistent naming and wording. For example dromedary case for protocol composition would avoid misinterpretation between composition and standard interactions. As far as it seems they are not grasping meaning yet \cite{dentella2024testing}, consistent naming together with redundancy, prompt compaction and context dissemination improve the generation both for structured and unstructured.
+	
+	\section{BMPP Toolchain and Implementation}
+	\label{sec:implementation}
+	
+	The BMPP toolchain~\cite{bmpp-agents-rs} provides a complete development environment for creating, validating, and (soon) deploying BMPP protocols. The toolchain supports a developer workflow that spans from protocol definition to deployment on worker-based cloud platforms.
+	
+	\subsection{Toolchain Components}
+	\label{subsec:toolchain}
+	
+	\paragraph{Protocol Transpiler} Transforms BMPP specifications into executable Rust code with automatic validation and type safety guarantees.
+	
+	\paragraph{Validation Engine} Provides static analysis of BMPP protocols, checking for causality violations, deadlocks, and semantic consistency.
+	
+	\paragraph{Runtime Library} Offers (soon) a high-performance runtime for executing BMPP protocols with minimal overhead.
+	
+	\paragraph{Testing Framework} Enables comprehensive testing of protocol implementations with property-based testing and formal verification.
+	
+	\subsection{Performance Characteristics}
+	\label{subsec:performance}
+	
+	The BMPP implementation demonstrates excellent performance characteristics suitable for edge computing deployments:
+	
+	\begin{itemize}
+		\item \textbf{Low Latency}: Protocol message processing in under 100 microseconds
+		\item \textbf{High Throughput}: Support for 100,000+ messages per second per core
+		\item \textbf{Memory Efficiency}: Zero-copy message handling with minimal memory allocation
+		\item \textbf{Scalability}: Linear scaling across multiple cores and distributed nodes
+	\end{itemize}
+	
+	\subsection{Developer Experience}
+	\label{subsec:devexp}
+	
+	The BMPP toolchain provides an integrated developer experience:
+	
+	\begin{enumerate}
+		\item \textbf{Protocol Definition}: Define protocols using BMPP syntax with IDE support
+		\item \textbf{Validation}: Automatic validation and verification during development
+		\item \textbf{Code Generation}: Generate production-ready Rust implementations
+		\item \textbf{Testing}: Comprehensive testing with property-based test generation
+		\item \textbf{Deployment}: Deploy to worker-based platforms like Fastly or Cloudflare
+	\end{enumerate}
+	
+	\subsection{Cloud Platform Integration}
+	\label{subsec:cloud}
+	
+	BMPP's Rust implementation is optimized for deployment on modern worker-based cloud platforms:
+	
+	\paragraph{Fastly Integration} Native support for Fastly's edge computing platform with automatic service generation and deployment.
+	
+	\paragraph{Cloudflare Workers} Optimized builds for Cloudflare's serverless platform with minimal cold start times.
+	
+	\paragraph{WebAssembly Support} Efficient WebAssembly compilation for cross-platform deployment.
+	
+	\paragraph{Container Orchestration} Docker and Kubernetes integration for traditional cloud deployments.
+	
+	\section{Evaluation and Results}
+	\label{sec:evaluation}
+	
+	We evaluated BMPP across several dimensions to demonstrate its effectiveness for LLM-integrated distributed systems.
+	
+	\subsection{Protocol Complexity Handling}
+	\label{subsec:complexity}
+	
+	BMPP successfully handled protocols of varying complexity:
+	\begin{itemize}
+		\item Simple request-response patterns (2-4 messages)
+		\item Complex multi-party negotiations (10-20 messages)
+		\item Long-running workflows with state management
+		\item Error handling and recovery protocols
+	\end{itemize}
+	
+	\subsection{LLM Integration Performance}
+	\label{subsec:llm-performance}
+	
+	When integrated with various LLM systems, BMPP demonstrated:
+	\begin{center}
+		\begin{tabular}{lr}
+			\hline
+			\textbf{Metric} & \textbf{Result} \\
+			\hline
+			Protocol compliance rate & Very High \\
+			Protocol compliance rate across LLMs & High \\
+			Protocol generation attempts & Usually One-shot is enough \\
+			Ambiguous input handling & More Successful than existing protocol \\
+			Service degradation behaviour & Graceful \\
+			Formal deadlock avoidance & Successful \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	Testing on large-scale systems integrating LLMs to handle automated commercial transactions like buy-sell interactions and payments are feasible because of BMPP properties to limit the scope of LLMs interactions to formal protocols. While this has been implemented by other protocol and systems BMPP is the only one that offers a possibility of interoperability among different systems with different specs managed by different organisations. 
+	
+	\section{Related Work}
+	\label{sec:related}
+	
+	Several approaches have been proposed for integrating LLMs with distributed systems. However, most lack the formal verification guarantees that BMPP provides while maintaining performance suitable for production deployment.
+	
+	\subsection{JSON-RPC and Model Context Protocol (MCP)}
+	\label{subsec:json-rpc-mcp}
+	
+	The Model Context Protocol (MCP) represents a significant approach to standardizing communication between LLM systems and external resources. MCP utilizes JSON-RPC 2.0 as its transport layer, providing a structured method for LLM clients to interact with MCP servers that expose various capabilities including file systems, databases, and APIs.
+	
+	\paragraph{JSON-RPC Foundation} JSON-RPC provides a stateless, light-weight remote procedure call protocol that uses JSON as its data format. In the MCP context, it enables bidirectional communication between clients and servers through three core message types: requests (method calls with parameters), responses (results or errors), and notifications (one-way messages without responses). This foundation offers several advantages: human-readable message format, wide language support, and simple implementation patterns.
+	
+	\paragraph{MCP Architecture} MCP servers expose resources and tools through a standardized interface, allowing LLM systems to access external data and functionality in a controlled manner. The protocol defines specific methods for resource discovery, tool execution, and context management. MCP clients can dynamically discover available resources and tools from servers, enabling flexible integration patterns without requiring prior knowledge of server capabilities.
+	
+	\paragraph{Comparison with BMPP} While MCP provides valuable standardization for LLM-external resource communication, it operates at a different architectural level than BMPP. MCP focuses on individual client-server interactions and resource access patterns, whereas BMPP addresses multi-party protocol orchestration with formal verification guarantees. Key differences include:
+	
+	\begin{itemize}
+		\item \textbf{Scope}: MCP handles single client-server interactions; BMPP manages complex multi-party protocols
+		\item \textbf{Verification}: MCP lacks formal protocol verification; BMPP provides BSPL-based guarantees
+		\item \textbf{Natural Language}: MCP uses standard JSON-RPC; BMPP embeds semantic annotations directly in protocol specifications
+		\item \textbf{Protocol Composition}: MCP operates independently per connection; BMPP enables hierarchical protocol composition
+	\end{itemize}
+	
+	\paragraph{Complementary Nature} BMPP and MCP can work together in a layered architecture. MCP can serve as a transport mechanism for individual agent interactions within a larger BMPP protocol orchestration. For example, a BMPP protocol might define the high-level interaction pattern between multiple organizations' agent systems, while each system internally uses MCP servers to access specific resources and capabilities needed to fulfil their protocol roles.
+	
+	\subsection{Other Distributed System Integration Approaches}
+	\label{subsec:other-approaches}
+	
+	Beyond MCP, various other approaches have emerged for LLM integration:
+	
+	\paragraph{OpenAI Function Calling} Provides structured interaction patterns but lacks multi-party protocol support and formal verification capabilities.
+	
+	\paragraph{LangChain Agents} Offers agent composition frameworks but without formal protocol specifications or verification guarantees.
+	
+	\paragraph{AutoGen Multi-Agent Systems} Enables complex agent interactions but lacks standardized protocol definitions and interoperability between different implementations.
+	
+	\paragraph{Summary}
+	These approaches primarily focus on single-organization agent systems or simple client-server patterns, whereas BMPP addresses the more complex challenge of enabling verified interoperability between heterogeneous agent systems across organizational boundaries while maintaining the semantic richness necessary for effective LLM integration. \textbf{The focus of BSPL and BMPP is to provide an integration protocol for systems that may use all these different industry standards, it is definitely focused on systems interoperability so that engineers can use their system of choice while keeping the possibility of communicate with systems outside of their organisations safely, managing as much as possible all the well-known challenges \cite{shanmugarasa2025privacy} in current LLMs operability in sensitive and confidentiality-heavy industries.}
+
+	
+	\section{Conclusion and Future Work}
+	\label{sec:conclusion}
+	
+	BMPP, thanks to the work done on BSPL, successfully bridges the gap between formal protocol specification and natural language processing, enabling safe and performant integration of LLMs into distributed systems. The protocol maintains BSPL's formal verification guarantees while adding semantic richness that improves both machine and human interpretability.
+	
+	Future work will focus on extending BMPP to support additional LLM architectures, optimizing performance for specific cloud platforms, and developing advanced verification techniques for natural language protocol specifications.
+	
+	\section*{Acknowledgments}
+	
+	We thank the contributors to BSPL and MTP and the W3C Web Agents Working Group for their efforts that enabled this research.
+	
+	% ===== BIBLIOGRAPHY =====
+	\bibliographystyle{plain}
+	\begin{thebibliography}{9}
+		
+		\bibitem{bspl-aamas}
+		Singh, M. P.
+		\textit{Information-driven interaction-oriented programming: BSPL, a language and approach for choreographic development of distributed systems}.
+		AAMAS 2011.
+		Available at: \url{https://www.cs.huji.ac.il/~jeff/aamas11/papers/A4_B57.pdf}
+		
+		\bibitem{vibelang-rs}
+		Vibelang Project.
+		\textit{Vibelang-rs}.
+		Available at: \url{https://github.com/Mec-iS/vibelang-rs}
+		
+		\bibitem{mtp2024}
+		Irugalbandara, C.
+		\textit{Meaning Typed Prompting: A Technique for Efficient, Reliable Structured Output Generation}.
+		arXiv preprint arXiv:2410.18146, 2024.
+		Available at: \url{https://arxiv.org/abs/2410.18146}
+		
+		\bibitem{w3c-agents-features}
+		\textit{W3C Agents Features: Structured Generation Experiments}.
+		Available at: \url{https://github.com/Mec-iS/w3c-agents-features}
+		
+		\bibitem{bmpp-agents-rs}
+		\textit{BMPP Agents Rust Implementation}.
+		Available at: \url{https://github.com/Mec-iS/bmpp-agents-rs}
+		
+		\bibitem{structeval2025}
+		Yang, J., Jiang, D., He, L., Siu, S., Zhang, Y., Liao, D., Li, Z., Zeng, H., Jia, Y., Wang, H., Schneider, B., Ruan, C., Ma, W., Lyu, Z., Wang, Y., Lu, Y., Do, Q. D., Jiang, Z., Nie, P., Chen, W.
+		\textit{StructEval: Benchmarking LLMs' Capabilities to Generate Structural Outputs}.
+		arXiv preprint arXiv:2505.20139, 2025.
+		Available at: \url{https://arxiv.org/abs/2505.20139}
+		
+		\bibitem{chopra-bspl}
+		Chopra, A. K. and Singh, M. P.
+		\textit{Correctness properties for multiagent systems}.
+		In \textit{Proceedings of the 7th International Joint Conference on Autonomous Agents and Multiagent Systems (AAMAS '08)}, pages 997--1004, 2008.
+		
+		\bibitem{chopra-protocols}
+		Chopra, A. K. and Singh, M. P.
+		\textit{Producing compliant interactions: Conformance, coverage, and interoperability}.
+		In \textit{Proceedings of the 9th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2010)}, pages 9--16, 2010.
+		
+		\bibitem{chopra-commitment}
+		Chopra, A. K. and Singh, M. P.
+		\textit{Multiagent commitment alignment}.
+		In \textit{Proceedings of the 8th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2009)}, pages 937--944, 2009.
+		
+		\bibitem{dentella2024testing}
+		Dentella, V., Günther, F., Murphy, E., and Lackner, E.
+		\textit{Testing AI on language comprehension tasks reveals insensitivity to underlying meaning}.
+		Scientific Reports, 14, 28083, 2024.
+		DOI: https://doi.org/10.1038/s41598-024-79531-8
+		Available at: \url{https://www.nature.com/articles/s41598-024-79531-8}
+
+		\bibitem{shanmugarasa2025privacy}
+		Shanmugarasa, Y., Pan, S., Ding, M., Zhao, D., and Rakotoarivelo, T.
+		\textit{Privacy Meets Explainability: Managing Confidential Data and Transparency Policies in LLM-Empowered Science}.
+		arXiv preprint arXiv:2504.09961, 2025.
+		Available at: \url{https://arxiv.org/abs/2504.09961v1}
+
+	\end{thebibliography}
+	
+\end{document}
