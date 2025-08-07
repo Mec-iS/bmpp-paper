@@ -86,13 +86,15 @@ It can provide relevant improvements in terms of financial costs monitoring and 
 
 ## Comparison with Existing Solutions
 
-| Feature | BMPP | MCP | LangChain | AutoGen |
-|---------|------|-----|-----------|---------|
-| Formal Verification | ✅ | ❌ | ❌ | ❌ |
-| Multi-Party Protocols | ✅ | ❌ | Limited | Limited |
-| Cross-Organizational | ✅ | ❌ | ❌ | ❌ |
-| Natural Language Annotations | ✅ | ❌ | ❌ | ❌ |
-| Edge Deployment | ✅ | ❌ | Limited | Limited |
+Starting from the approach of redesigning the developer experience, the BMPP toolchain compares with other tools available on the market as:
+
+| Feature | BMPP | MCP | LangChain | AutoGen | JSON-RPC |
+|---------|------|-----|-----------|---------|----------|
+| Formal Verification | ✅ | ❌ | ❌ | ❌    | Limited  |
+| Multi-Party Protocols | ✅ | ❌ | Limited  | Limited | ❌ |
+| Cross-Organizational | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Natural Language Annotations | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Edge Deployment-friendly | ✅ | ❌ | Limited | Limited | - |
 
 ## Contributing
 
