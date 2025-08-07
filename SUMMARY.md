@@ -74,7 +74,7 @@ The workflow introduced is particularly efficient and effective using these clou
 - ☁️ **Nuvolaris** Serverless
 - 🐳 **Container Orchestration**: Docker and Kubernetes support
 - 🌍 **WebAssembly**: Cross-platform edge deployment
-- 
+
 It can provide relevant improvements in terms of financial costs monitoring and energy efficiency.
 
 ## Use Cases
