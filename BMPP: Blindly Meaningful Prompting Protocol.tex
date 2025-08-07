@@ -358,18 +358,18 @@
 	\subsection{Toolchain Components}
 	\label{subsec:toolchain}
 	
-	\paragraph{Protocol Transpiler} Transforms BMPP specifications into executable Rust code with automatic validation and type safety guarantees.
-	
 	\paragraph{Validation Engine} Provides static analysis of BMPP protocols, checking for causality violations, deadlocks, and semantic consistency.
+
+	\paragraph{Protocol Transpiler} Transforms BMPP specifications into executable Rust code with automatic validation and type safety guarantees.
 	
 	\paragraph{Runtime Library} Offers (soon) a high-performance runtime for executing BMPP protocols with minimal overhead.
 	
 	\paragraph{Testing Framework} Enables comprehensive testing of protocol implementations with property-based testing and formal verification.
 	
-	\subsection{Performance Characteristics}
+	\subsection{Reference Performance Characteristics}
 	\label{subsec:performance}
 	
-	The BMPP implementation demonstrates excellent performance characteristics suitable for edge computing deployments:
+	The BMPP implementation inherits excellent performance characteristics from BSPL, making it suitable for edge computing deployments:
 	
 	\begin{itemize}
 		\item \textbf{Low Latency}: Protocol message processing in under 100 microseconds
@@ -407,12 +407,12 @@
 	\section{Evaluation and Results}
 	\label{sec:evaluation}
 	
-	I evaluated according to my experience with the different protocols and frameworks available in the market BMPP across several dimensions to demonstrate its effectiveness for LLM-integrated distributed systems.
+	I evaluated BMPP according to my experience with the different protocols and frameworks available in the market across several dimensions to demonstrate its effectiveness for LLM-integrated distributed systems. Some of the experiments are available at \cite{lmm-agents-features}.
 	
 	\subsection{Protocol Complexity Handling}
 	\label{subsec:complexity}
 	
-	BMPP successfully handled protocols of varying complexity:
+	BMPP inherits from BSPL the characteristics for successfully handling protocols of varying complexity:
 	\begin{itemize}
 		\item Simple request-response patterns (2-4 messages)
 		\item Complex multi-party negotiations (10-20 messages)
@@ -423,7 +423,7 @@
 	\subsection{LLM Integration Performance}
 	\label{subsec:llm-performance}
 	
-	When integrated with various LLM systems, BMPP demonstrated:
+	When integrated with various LLM systems, compared to protocols expressed in plain JSON or XML, BMPP demonstrated:
 	\begin{center}
 		\begin{tabular}{lr}
 			\hline
@@ -541,7 +541,12 @@
 		Chopra, A. K. and Singh, M. P.
 		\textit{Multiagent commitment alignment}.
 		In \textit{Proceedings of the 8th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2009)}, pages 937--944, 2009.
-		
+
+		\bibitem{lmm-agents-features}
+		\textit{Features Engineering for LLMs contexts: W3C Web Agents Features Engineering Repository}.
+		GitHub repository, 2025.
+		Available at: \url{https://github.com/Mec-iS/w3c-agents-features}
+
 		\bibitem{dentella2024testing}
 		Dentella, V., Günther, F., Murphy, E., and Lackner, E.
 		\textit{Testing AI on language comprehension tasks reveals insensitivity to underlying meaning}.
