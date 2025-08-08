@@ -1,6 +1,6 @@
 # BMPP A reliable interoperability protocol for LLM systems
 
-**Status**: 📝 Draft Paper | 🚧 Implementation in Progress | 🔬 Research Stage
+**Status**: 📝 Draft Paper | 🚧 Implementation in Progress
 
 This is the draft paper to introduce **Blindly Meaningful Protocol (BMPP)** as a reliable interoperability protocol for systems based on/involving operability of Natural Language machines like LLMs/GPTs.
 
