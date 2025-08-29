@@ -10,3 +10,6 @@ BMPP allows working on a different level (systems interoperability) than LangCha
 * context management (using [vibelang-rs](https://github.com/Mec-iS/vibelang-rs))
 * flow management (using [bmpp-agents-rs](https://github.com/Mec-iS/bmpp-agents-rs))
 * runtime (only implemented as example but potentially easily deployable in cloud workers setting)
+
+## Sponsor
+You can sponsor my research at [Github Sponsors](https://github.com/sponsors/Mec-iS/)
