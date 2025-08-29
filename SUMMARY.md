@@ -121,3 +121,6 @@ If you use BMPP in your research, please cite:
 - Meaning Typed Prompting (MTP) project contributors
 
 For questions, issues, or collaboration inquiries, please [open an issue](https://github.com/Mec-iS/bmpp-paper/issues) or contact the author.
+
+## Sponsor
+You can sponsor my research at [Github Sponsors](https://github.com/sponsors/Mec-iS/)
