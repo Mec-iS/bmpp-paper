@@ -2,7 +2,7 @@
 
 **Status**: 📝 Draft Paper | 🚧 Implementation in Progress
 
-This is the draft paper to introduce **Blindly Meaningful Protocol (BMPP)** as a reliable interoperability protocol for systems based on/involving operability of Natural Language machines like LLMs/GPTs.
+This is the draft paper to introduce **Blindly Meaningful Prompting Protocol (BMPP)** as a reliable interoperability protocol for systems based on/involving operability of Natural Language machines like LLMs/GPTs.
 
 Some preliminary work about features engineering for structured generation using different LLMs has been done at [this repository](https://github.com/Mec-iS/w3c-agents-features).
 
